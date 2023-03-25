@@ -20,7 +20,6 @@ interface PestCategoryDao {
 
     @Delete
     fun delete(pestCategory: PestCategory)
-
     @Query("delete from pestcategory")
     fun deleteAll()
 }

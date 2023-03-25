@@ -7,7 +7,7 @@ import cn.merlin.pests.dao.PestDao
 import cn.merlin.pests.utils.Pest
 import cn.merlin.pests.utils.PestCategory
 
-@Database(entities = [Pest::class,PestCategory::class], version = 1)
+@Database(entities = [Pest::class,PestCategory::class], version = 2, exportSchema = false)
 abstract class PestDB : RoomDatabase(){
     abstract fun getPestDao(): PestDao
     abstract fun getPestCategoryDao(): PestCategoryDao

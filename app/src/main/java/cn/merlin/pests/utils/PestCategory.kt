@@ -13,5 +13,7 @@ data class PestCategory(
     var categoryName: String,
     @ColumnInfo(name = "categoryDescription")
     var categoryDescription: String,
+    @ColumnInfo(name = "deleted")
+    var deleted: Int = 0
 ) {
 }

@@ -17,6 +17,8 @@ import cn.merlin.pests.ui.layout.SearchBar
 import cn.merlin.pests.ui.theme.PestsTheme
 import cn.merlin.pests.utils.Pest
 import cn.merlin.pests.utils.PestCategory
+import cn.merlin.pests.utils.model.PestCategoryModel
+import cn.merlin.pests.utils.model.PestModel
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("MutableCollectionMutableState")
@@ -27,8 +29,17 @@ class MainActivity : ComponentActivity() {
             pestDB.getPestCategoryDao().insert(PestCategory(categoryName = "Default", categoryDescription = "Default Category"))
         setContent {
             PestsTheme {
-                val pestList by remember { mutableStateOf(pestDB.getPestDao().queryAll()) }
-                val categoryList by remember { mutableStateOf(pestDB.getPestCategoryDao().queryAll()) }
+                val pestList = remember { mutableStateOf(mutableListOf<PestModel>()) }
+                val categoryList = remember { mutableStateOf(mutableListOf<PestCategoryModel>()) }
+                val plist = pestDB.getPestDao().queryAll()
+                val CList = pestDB.getPestCategoryDao().queryAll()
+                for(pest in plist){
+                    pestList.value.add(PestModel(pest))
+                }
+                for(category in CList){
+                    categoryList.value.add(PestCategoryModel(category))
+                }
+//                val categoryList = remember { mutableStateOf(pestDB.getPestCategoryDao().queryAll()) }
                 HomePage(pestDB,categoryList,pestList)
             }
         }
@@ -36,7 +47,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomePage(pestDB: PestDB, categoryList: MutableList<PestCategory>, pestList: MutableList<Pest>) {
+fun HomePage(pestDB: PestDB, categoryList: MutableState<MutableList<PestCategoryModel>>, pestList: MutableState<MutableList<PestModel>>) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background) {

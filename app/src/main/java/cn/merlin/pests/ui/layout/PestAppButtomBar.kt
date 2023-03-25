@@ -1,6 +1,5 @@
 package cn.merlin.pests.ui.layout
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,32 +11,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Image
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import cn.merlin.pests.R
 import cn.merlin.pests.database.PestDB
-import cn.merlin.pests.ui.components.MultiFabItem
-import cn.merlin.pests.ui.components.MultiFloatingActionButton
+import cn.merlin.pests.ui.Dialogs.AddPestDialog
 import cn.merlin.pests.utils.Pest
 import cn.merlin.pests.utils.PestCategory
+import cn.merlin.pests.utils.model.PestCategoryModel
+import cn.merlin.pests.utils.model.PestModel
 
 @Composable
 fun ButtomBar(
     pestDB: PestDB,
-    categoryList: MutableList<PestCategory>,
-    pestList: MutableList<Pest>,
+    categoryList: MutableState<MutableList<PestCategoryModel>>,
+    pestList: MutableState<MutableList<PestModel>>,
     modifier: Modifier = Modifier
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog = remember { mutableStateOf(false) }
     Surface(
         modifier = modifier
             .padding(top = 6.dp)
@@ -66,14 +62,44 @@ fun ButtomBar(
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(onClick = {
-                        showDialog = !showDialog
+                        showDialog.value = !showDialog.value
                     }) {
                         Icon(Icons.Filled.Add, null)
                     }
-                    if(showDialog){
-                        Dialog(onDismissRequest = { showDialog = !showDialog }) {
-
-                        }
+                    if (showDialog.value) {
+                        AddPestDialog(showDialog,categoryList)
+//                        AlertDialog(
+//                            onDismissRequest = {
+//                                showDialog = false
+//                            },
+//                            title = {
+//                                Text(text = "Title")
+//                            },
+//                            text = {
+//                                Text(
+//                                    "This area typically contains the supportive text " +
+//                                            "which presents the details regarding the Dialog's purpose."
+//                                )
+//                            },
+//                            confirmButton = {
+//                                TextButton(
+//                                    onClick = {
+//                                        showDialog = false
+//                                    }
+//                                ) {
+//                                    Text("Confirm")
+//                                }
+//                            },
+//                            dismissButton = {
+//                                TextButton(
+//                                    onClick = {
+//                                        showDialog = false
+//                                    }
+//                                ) {
+//                                    Text("Dismiss")
+//                                }
+//                            }
+//                        )
                     }
                 }
             }
@@ -90,3 +116,4 @@ fun ButtomBar(
         }
     }
 }
+
