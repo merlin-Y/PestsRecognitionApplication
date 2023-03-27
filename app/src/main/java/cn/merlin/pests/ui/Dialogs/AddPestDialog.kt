@@ -92,7 +92,7 @@ fun AddPestDialog(
                         }
                     }
                     Image(
-                        painterResource(id = R.drawable.pest1),
+                        painterResource(id = R.drawable.pest2),
                         null,
                         modifier = Modifier
                             .height(125.dp)
