@@ -76,7 +76,7 @@ fun PestAppMain(
                             )
                             val CList = pestDB.getPestCategoryDao().queryAll()
                             categoryList.value.clear()
-                            for(category in CList){
+                            for (category in CList) {
                                 categoryList.value.add(PestCategoryModel(category))
                             }
                         }.start()
@@ -129,10 +129,11 @@ fun PestAppMain(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .padding(start = 36.dp, end = 36.dp, top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+//                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+
                 items(items = pestList.value) {
-                    if(it.deleted.value == 0)
+                    if (it.deleted.value == 0)
                         PestCard(pestDB = pestDB, pestModel = it)
                 }
             }
@@ -140,61 +141,8 @@ fun PestAppMain(
     }
 }
 
-//@Composable
-//fun PestCard(pest: Pest) {
-////    val painter = rememberCoilPainter(pest.pestImage)
-//    Card(
-//        modifier = Modifier
-//            .padding(
-//                start = 10.dp,
-//                end = 10.dp,
-//                top = 5.dp,
-//                bottom = 5.dp
-//            )
-//            .fillMaxWidth()
-//            .height(158.dp),
-//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-//        shape = MaterialTheme.shapes.large,
-//        elevation = CardDefaults.cardElevation(1.dp),
-//    ) {
-//        Row(
-//            horizontalArrangement = Arrangement.spacedBy(10.dp),
-//        ) {
-//            Image(
-//                painterResource(id = R.drawable.pest1),
-//                null,
-//                modifier = Modifier
-//                    .height(160.dp)
-//                    .width(160.dp),
-//                contentScale = ContentScale.Crop
-//            )
-//            Column(
-//                verticalArrangement = Arrangement.spacedBy(10.dp),
-//            ) {
-//                Text(text = pest.pestName, fontSize = 20.sp)
-//                Text(text = "    " + pest.pestDescription, fontSize = 15.sp)
-//            }
-//        }
-//    }
-//}
-
-//@Preview
-//@Composable
-//fun MainPriview() {
-//    PestCard(
-//        Pest(
-//            pid = 1,
-//            pestName = "茶小绿叶蝉",
-//            pestImage = "image",
-//            pestDescription = "该虫主要以成虫、若虫刺吸茶树嫩梢汁液，雌成虫产卵于嫩梢茎内，致使茶树生长受阻，被害芽叶卷曲、硬化，叶尖、叶缘红褐焦枯。",
-//            pestSolutio = "经常检查，每百叶有虫夏茶达6头、秋茶达12头，开始用药；分期分批及时采茶，减少虫卵量；清除杂草，减低虫源。",
-//            categoryid = 1
-//        )
-//    )
-//}
-
 @Composable
-fun PestCard(pestDB: PestDB,pestModel: PestModel) {
+fun PestCard(pestDB: PestDB, pestModel: PestModel) {
 //    val painter = rememberCoilPainter(pest.pestImage)
     Card(
         modifier = Modifier
@@ -202,7 +150,7 @@ fun PestCard(pestDB: PestDB,pestModel: PestModel) {
                 start = 10.dp,
                 end = 10.dp,
                 top = 5.dp,
-                bottom = 5.dp
+                bottom = 15.dp
             )
             .fillMaxWidth()
             .height(158.dp),
@@ -271,15 +219,17 @@ fun PestCard(pestDB: PestDB,pestModel: PestModel) {
                     onClick = {
                         Thread {
                             pestModel.deleted.value = 1;
-                            pestDB.getPestDao().update(Pest(
-                                pid = pestModel.pid,
-                                pestName = pestModel.pestName.value,
-                                pestImage = pestModel.pestImage,
-                                pestDescription = pestModel.pestDescription.value,
-                                pestSolutio = pestModel.pestSolutio.value,
-                                categoryid = pestModel.categoryid.value,
-                                deleted = pestModel.deleted.value
-                            ))
+                            pestDB.getPestDao().update(
+                                Pest(
+                                    pid = pestModel.pid,
+                                    pestName = pestModel.pestName.value,
+                                    pestImage = pestModel.pestImage,
+                                    pestDescription = pestModel.pestDescription.value,
+                                    pestSolutio = pestModel.pestSolutio.value,
+                                    categoryid = pestModel.categoryid.value,
+                                    deleted = pestModel.deleted.value
+                                )
+                            )
                         }.start()
                     },
                     modifier = Modifier.fillMaxHeight(),

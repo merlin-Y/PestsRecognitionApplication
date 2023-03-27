@@ -67,7 +67,7 @@ fun ButtomBar(
                         Icon(Icons.Filled.Add, null)
                     }
                     if (showDialog.value) {
-                        AddPestDialog(showDialog,categoryList)
+                        AddPestDialog(showDialog,categoryList,pestList,pestDB)
 //                        AlertDialog(
 //                            onDismissRequest = {
 //                                showDialog = false
