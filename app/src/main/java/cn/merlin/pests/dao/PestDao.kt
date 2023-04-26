@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import cn.merlin.pests.utils.Pest
+import kotlinx.coroutines.selects.select
 
 @Dao
 interface PestDao {
@@ -23,4 +24,16 @@ interface PestDao {
 
     @Query("delete from pest")
     fun deleteAll()
+
+    @Query("select * from pest where pestName like '%' || :Name || '%'")
+    fun queryByName(Name: String): MutableList<Pest>
+
+    @Query("select * from pest where pestDescription like '%' || :des || '%'")
+    fun queryBuDes(des: String): MutableList<Pest>
+
+    @Query("select * from pest where pestSolution like '%' || :sol || '%'")
+    fun queryBySol(sol: String): MutableList<Pest>
+
+    @Query("select * from pest where categoryid = :cId")
+    fun groupBycId(cId: Long): MutableList<Pest>
 }

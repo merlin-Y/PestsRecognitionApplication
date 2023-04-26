@@ -1,5 +1,7 @@
 package cn.merlin.pests.ui.layout
 
+
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,33 +13,30 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Image
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import cn.merlin.pests.database.PestDB
 import cn.merlin.pests.ui.Dialogs.AddPestDialog
-import cn.merlin.pests.utils.Pest
-import cn.merlin.pests.utils.PestCategory
 import cn.merlin.pests.utils.model.PestCategoryModel
 import cn.merlin.pests.utils.model.PestModel
 
 @Composable
 fun ButtomBar(
     pestDB: PestDB,
-    categoryList: MutableState<MutableList<PestCategoryModel>>,
-    pestList: MutableState<MutableList<PestModel>>,
+    categoryList: SnapshotStateList<PestCategoryModel>,
+    pestList: SnapshotStateList<PestModel>,
     modifier: Modifier = Modifier
 ) {
-    var showDialog = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
+    val imageUri = remember{ mutableStateOf<Uri?>(null) }
     Surface(
         modifier = modifier
             .padding(top = 6.dp)
-            .height(100.dp)
+            .height(70.dp)
             .fillMaxWidth()
     ) {
         Row(
@@ -67,7 +66,7 @@ fun ButtomBar(
                         Icon(Icons.Filled.Add, null)
                     }
                     if (showDialog.value) {
-                        AddPestDialog(showDialog,categoryList,pestList,pestDB)
+                        AddPestDialog(showDialog,categoryList,pestList,pestDB,imageUri)
 //                        AlertDialog(
 //                            onDismissRequest = {
 //                                showDialog = false

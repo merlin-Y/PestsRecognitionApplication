@@ -1,46 +1,44 @@
 package cn.merlin.pests.ui.layout
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.More
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.merlin.pests.R
 import cn.merlin.pests.database.PestDB
+import cn.merlin.pests.ui.components.PestCard
 import cn.merlin.pests.utils.Pest
 import cn.merlin.pests.utils.PestCategory
 import cn.merlin.pests.utils.model.PestCategoryModel
 import cn.merlin.pests.utils.model.PestModel
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PestAppMain(
     pestDB: PestDB,
-    categoryList: MutableState<MutableList<PestCategoryModel>>,
-    pestList: MutableState<MutableList<PestModel>>,
+    categoryList: SnapshotStateList<PestCategoryModel>,
+    pestList: SnapshotStateList<PestModel>,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
-            .padding(bottom = 16.dp)
+            .padding(bottom = 4.dp)
             .background(MaterialTheme.colorScheme.surface)
     ) {
         var showDialog = remember { mutableStateOf(false) }
@@ -75,9 +73,9 @@ fun PestAppMain(
                                 )
                             )
                             val CList = pestDB.getPestCategoryDao().queryAll()
-                            categoryList.value.clear()
+                            categoryList.clear()
                             for (category in CList) {
-                                categoryList.value.add(PestCategoryModel(category))
+                                categoryList.add(PestCategoryModel(category))
                             }
                         }.start()
                     },
@@ -92,7 +90,7 @@ fun PestAppMain(
                         tint = MaterialTheme.colorScheme.secondary
                     )
                 }
-                if (categoryList.value.size > 1)
+                if (categoryList.size > 1)
                     LazyRow(
                         modifier = Modifier
                             .padding(start = 12.dp)
@@ -101,9 +99,16 @@ fun PestAppMain(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         state = liststate
                     ) {
-                        items(items = categoryList.value) {
+                        items(items = categoryList) {
                             Button(
-                                onClick = {},
+                                onClick =
+                                {
+                                    pestList.clear()
+                                    val pests = pestDB.getPestDao().groupBycId(it.cid!!)
+                                    for (pest in pests) {
+                                        pestList.add(PestModel(pest))
+                                    }
+                                },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
                                     contentColor = MaterialTheme.colorScheme.onBackground
@@ -128,121 +133,92 @@ fun PestAppMain(
             LazyColumn(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(start = 36.dp, end = 36.dp, top = 16.dp),
+                    .padding(start = 26.dp, end = 26.dp, top = 16.dp),
 //                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-
-                items(items = pestList.value) {
-                    if (it.deleted.value == 0)
-                        PestCard(pestDB = pestDB, pestModel = it)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PestCard(pestDB: PestDB, pestModel: PestModel) {
-//    val painter = rememberCoilPainter(pest.pestImage)
-    Card(
-        modifier = Modifier
-            .padding(
-                start = 10.dp,
-                end = 10.dp,
-                top = 5.dp,
-                bottom = 15.dp
-            )
-            .fillMaxWidth()
-            .height(158.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(1.dp),
-    ) {
-        LazyRow() {
-            item()
-            {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.width(310.dp)
-                ) {
-                    Image(
-                        painterResource(id = R.drawable.pest1),
-                        null,
-                        modifier = Modifier
-                            .height(160.dp)
-                            .width(160.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        Text(text = pestModel.pestName.value, fontSize = 20.sp)
-                        Text(text = "    " + pestModel.pestDescription.value, fontSize = 15.sp)
-                    }
-                }
-            }
-            item {
-                Button(
-                    shape = RectangleShape,
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff22c64d))
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(Icons.Filled.More, null)
-                        Text(text = "更多")
-                    }
-                }
-            }
-            item {
-                Button(
-                    shape = RectangleShape,
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0166ff))
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(Icons.Filled.Edit, null)
-                        Text(text = "编辑")
-                    }
-                }
-            }
-            item {
-                Button(
-                    shape = RectangleShape,
-                    onClick = {
+                items(items = pestList) {
+                    val dismissState = rememberDismissState()
+                    if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
                         Thread {
-                            pestModel.deleted.value = 1;
+                            it.deleted.value = 1;
                             pestDB.getPestDao().update(
                                 Pest(
-                                    pid = pestModel.pid,
-                                    pestName = pestModel.pestName.value,
-                                    pestImage = pestModel.pestImage,
-                                    pestDescription = pestModel.pestDescription.value,
-                                    pestSolutio = pestModel.pestSolutio.value,
-                                    categoryid = pestModel.categoryid.value,
-                                    deleted = pestModel.deleted.value
+                                    pid = it.pid,
+                                    pestName = it.pestName.value,
+                                    pestImage = it.pestImage,
+                                    pestDescription = it.pestDescription.value,
+                                    pestSolutio = it.pestSolutio.value,
+                                    categoryid = it.categoryid.value,
+                                    deleted = it.deleted.value
                                 )
                             )
                         }.start()
-                    },
-                    modifier = Modifier.fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xffff5d5b))
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    }
+                    SwipeToDismiss(
+                        state = dismissState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItemPlacement(),
+                        dismissThresholds = { direction ->
+                            androidx.compose.material.FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
+                        },
+                        directions = setOf(DismissDirection.StartToEnd),
+                        background = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                            ) {
+
+                            }
+                        }
                     ) {
-                        Icon(Icons.Filled.Delete, null)
-                        Text(text = "删除")
+                        if (it.deleted.value == 0)
+                            PestCard(pestDB = pestDB, pestModel = it)
                     }
                 }
             }
         }
     }
 }
+
+
+
+//fun ImageList(images: List<String>) {
+//    LazyColumn {
+//        items(images) { imageUrl ->
+//            var painter by remember { mutableStateOf<ImagePainter?>(null) }
+//
+//            Card(
+//                modifier = Modifier.fillMaxWidth().padding(16.dp),
+//                elevation = 4.dp,
+//            ) {
+//                if (painter != null) {
+//                    Image(
+//                        painter = painter!!,
+//                        contentDescription = null,
+//                        modifier = Modifier.fillMaxWidth(),
+//                        contentScale = ContentScale.Crop,
+//                    )
+//                } else {
+//                    Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+//                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+//                    }
+//                }
+//            }
+//
+//            LaunchedEffect(imageUrl) {
+//                val newPainter = rememberImagePainter(
+//                    data = imageUrl,
+//                    builder = {
+//                        // Configure Glide options here, such as cache strategy, transformations, and animations.
+//                        diskCacheStrategy(DiskCacheStrategy.ALL)
+//                        centerCrop()
+//                    }
+//                )
+//                newPainter.load()
+//                painter = newPainter
+//            }
+//        }
+//    }
+//}

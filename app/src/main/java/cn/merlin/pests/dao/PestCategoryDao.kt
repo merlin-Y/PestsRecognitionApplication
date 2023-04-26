@@ -12,6 +12,9 @@ interface PestCategoryDao {
     @Query("select * from pestcategory")
     fun queryAll(): MutableList<PestCategory>
 
+    @Query("select * from pestcategory where categoryID = :cId")
+    fun findById(cId: Int): PestCategory
+
     @Insert
     fun insert(pestCategory: PestCategory?)
 
