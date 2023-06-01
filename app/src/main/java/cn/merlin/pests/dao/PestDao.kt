@@ -13,6 +13,9 @@ interface PestDao {
     @Query("select * from pest")
     fun queryAll(): MutableList<Pest>
 
+    @Query("select * from pest where deleted = 0")
+    fun selectAll(): MutableList<Pest>
+
     @Insert
     fun insert(pest: Pest?)
 

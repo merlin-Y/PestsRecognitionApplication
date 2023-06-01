@@ -18,7 +18,7 @@ data class Pest (
     @ColumnInfo(name = "pestSolution")
     var pestSolutio: String,
     @ColumnInfo(name = "categoryID")
-    var categoryid: Int,
+    var categoryid: Long,
     @ColumnInfo(name = "deleted")
     var deleted: Int = 0
 ){

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.More
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,15 +24,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.merlin.pests.R
 import cn.merlin.pests.database.PestDB
+import cn.merlin.pests.ui.Dialogs.EditPestDialog
 import cn.merlin.pests.ui.Dialogs.PestDetailsDialog
 import cn.merlin.pests.utils.Pest
+import cn.merlin.pests.utils.model.PestCategoryModel
 import cn.merlin.pests.utils.model.PestModel
 import java.io.File
 import java.io.FileInputStream
 
 @Composable
-fun PestCard(pestDB: PestDB, pestModel: PestModel, modifier: Modifier = Modifier) {
+fun PestCard(pestDB: PestDB, pestModel: PestModel, categoryList: SnapshotStateList<PestCategoryModel>,
+             modifier: Modifier = Modifier) {
     val moreButtonClicked = remember { mutableStateOf(false) }
+    val editButtonClicked = remember { mutableStateOf(false) }
     val imagefile = File(pestModel.pestImage)
     val input = FileInputStream(imagefile)
     val map = remember { mutableStateOf(BitmapFactory.decodeStream(input)) }
@@ -103,7 +108,9 @@ fun PestCard(pestDB: PestDB, pestModel: PestModel, modifier: Modifier = Modifier
             item {
                 Button(
                     shape = RectangleShape,
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                              editButtonClicked.value = !editButtonClicked.value
+                              },
                     modifier = Modifier.fillMaxHeight(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff0166ff))
                 ) {
@@ -149,4 +156,6 @@ fun PestCard(pestDB: PestDB, pestModel: PestModel, modifier: Modifier = Modifier
     }
     if (moreButtonClicked.value)
         PestDetailsDialog(moreButtonClicked, pestModel, pestDB)
+//    else if(editButtonClicked.value)
+//        EditPestDialog(editButtonClicked, pestModel, pestDB,categoryList)
 }

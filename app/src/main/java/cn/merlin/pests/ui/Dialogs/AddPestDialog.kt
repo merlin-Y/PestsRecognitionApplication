@@ -75,7 +75,7 @@ fun AddPestDialog(
     val pestImage = remember { mutableStateOf("") }
     val selectedCategory = remember { mutableStateOf(categoryList[0]) }
     var filelabel = ""
-    val searched = remember {mutableStateOf(false)}
+    val searched = remember { mutableStateOf(false) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -83,11 +83,15 @@ fun AddPestDialog(
         onResult = { uri: Uri? ->
             imageUri.value = uri
         })
-
-
     Dialog(
         onDismissRequest = { showDialog.value = false },
     ) {
+        for(c in categoryList){
+            if(c.deleted.value == 0){
+                selectedCategory.value = c
+                break
+            }
+        }
         Surface(
             modifier = Modifier
                 .width(400.dp)
@@ -139,9 +143,10 @@ fun AddPestDialog(
                                     .width(125.dp),
                             )
                         } else {
-                            bitmap = context.contentResolver.openInputStream(imageUri.value!!)?.use {
-                                BitmapFactory.decodeStream(it)
-                            }
+                            bitmap =
+                                context.contentResolver.openInputStream(imageUri.value!!)?.use {
+                                    BitmapFactory.decodeStream(it)
+                                }
                             Image(
                                 bitmap = bitmap!!.asImageBitmap(),
                                 null,
@@ -185,14 +190,14 @@ fun AddPestDialog(
                                                         responseBody.toString(),
                                                         Array<PestNetworkModel>::class.java
                                                     ))
-                                                    if(pests.isNotEmpty()){
+                                                    if (pests.isNotEmpty()) {
                                                         pestName.value = pests[0].pname
                                                         pestDescription.value =
                                                             pests[0].pdescription
                                                         pestSolutio.value = pests[0].psolution
                                                         filelabel = pests[0].plabel
                                                         searched.value = true
-                                                    }else{
+                                                    } else {
                                                         Toast.makeText(
                                                             context,
                                                             "未检测到病虫，请重新发送。",
@@ -270,12 +275,13 @@ fun AddPestDialog(
                             modifier = Modifier.width(120.dp)
                         ) {
                             categoryList.forEach {
-                                DropdownMenuItem(
-                                    text = { Text(text = it.categoryName.value) },
-                                    onClick = {
-                                        selectedCategory.value = it
-                                        expend.value = false
-                                    })
+                                if (it.deleted.value == 0)
+                                    DropdownMenuItem(
+                                        text = { Text(text = it.categoryName.value) },
+                                        onClick = {
+                                            selectedCategory.value = it
+                                            expend.value = false
+                                        })
                             }
                         }
                     }
@@ -314,8 +320,9 @@ fun AddPestDialog(
                                 )
                                 val fileName = "$filelabel-$now.$type"
                                 val file = File("/storage/emulated/0/Download/PestApplication")
-                                if(!file.exists())      file.mkdirs()
-                                val input = context.contentResolver.openInputStream(imageUri.value!!)
+                                if (!file.exists()) file.mkdirs()
+                                val input =
+                                    context.contentResolver.openInputStream(imageUri.value!!)
                                 val buffer = ByteArray(input!!.available())
                                 input.read(buffer)
                                 val outputfile = File(file, fileName)
@@ -323,13 +330,14 @@ fun AddPestDialog(
                                 output.write(buffer)
                                 output.close()
                                 input.close()
-                                pestImage.value = "/storage/emulated/0/Download/PestApplication/$fileName"
+                                pestImage.value =
+                                    "/storage/emulated/0/Download/PestApplication/$fileName"
                                 val pest = Pest(
                                     pestName = pestName.value,
                                     pestDescription = pestDescription.value,
                                     pestSolutio = pestSolutio.value,
                                     pestImage = pestImage.value,
-                                    categoryid = selectedCategory.value.cid!!.toInt()
+                                    categoryid = selectedCategory.value.cid!!
                                 )
                                 pestList.add(PestModel(pest))
                                 imageUri.value = null
@@ -359,7 +367,6 @@ fun AddPestDialog(
         }
     }
 }
-
 
 
 //@SuppressLint("UnrememberedMutableState")

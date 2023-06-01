@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.room.Room
 import cn.merlin.pests.database.PestDB
+import cn.merlin.pests.ui.layout.AccountMain
 import cn.merlin.pests.ui.layout.ButtomBar
 import cn.merlin.pests.ui.layout.PestAppMain
 import cn.merlin.pests.ui.layout.SearchBar
@@ -49,13 +51,30 @@ class MainActivity : ComponentActivity() {
                     val categoryList = remember { mutableStateListOf<PestCategoryModel>() }
                     val plist = pestDB.getPestDao().queryAll()
                     val CList = pestDB.getPestCategoryDao().queryAll()
+                    val selectedPage = remember { mutableStateOf(0) }
+                    pestList.clear()
+                    categoryList.clear()
                     for (pest in plist) {
                         pestList.add(PestModel(pest))
                     }
                     for (category in CList) {
                         categoryList.add(PestCategoryModel(category))
                     }
-                    HomePage(pestDB, categoryList, pestList)
+                    Column() {
+                        if(selectedPage.value == 0){
+                            Column(modifier = Modifier.weight(1f).background(MaterialTheme.colorScheme.surface)) {
+                                SearchBar(pestDB = pestDB, categoryList = categoryList, pestList = pestList)
+                                PestAppMain(pestDB, categoryList, pestList)
+                            }
+                        }
+                        else if (selectedPage.value == 1) {
+                            Column(modifier = Modifier.weight(1f).background(MaterialTheme.colorScheme.surface)) {
+                                AccountMain()
+                            }
+                        }
+                        ButtomBar(pestDB, categoryList, pestList, selectedPage)
+                    }
+
                 }
             }
         }
@@ -66,25 +85,5 @@ class MainActivity : ComponentActivity() {
             val failed = result.filter { !it.value }.keys
             onResult(failed.toList())
         }.launch(arrayOf(*permissions))
-    }
-}
-
-@Composable
-fun HomePage(
-    pestDB: PestDB,
-    categoryList: SnapshotStateList<PestCategoryModel>,
-    pestList: SnapshotStateList<PestModel>
-) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(modifier = Modifier) {
-            Column(modifier = Modifier.weight(1f)) {
-                SearchBar(pestDB = pestDB, categoryList = categoryList, pestList = pestList)
-                PestAppMain(pestDB, categoryList, pestList)
-            }
-            ButtomBar(pestDB, categoryList, pestList)
-        }
     }
 }
