@@ -156,6 +156,6 @@ fun PestCard(pestDB: PestDB, pestModel: PestModel, categoryList: SnapshotStateLi
     }
     if (moreButtonClicked.value)
         PestDetailsDialog(moreButtonClicked, pestModel, pestDB)
-//    else if(editButtonClicked.value)
-//        EditPestDialog(editButtonClicked, pestModel, pestDB,categoryList)
+    else if(editButtonClicked.value)
+        EditPestDialog(editButtonClicked, pestModel, pestDB,categoryList)
 }
